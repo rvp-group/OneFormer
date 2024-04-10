@@ -433,7 +433,7 @@ class OneFormer(nn.Module):
                         }
                     )
 
-            return panoptic_seg, segments_info, cur_masks[keep_area], cur_mask_cls[keep_area]
+            return panoptic_seg, segments_info, cur_masks[keep_area], cur_scores[keep_area]
 
     def instance_inference(self, mask_cls, mask_pred, task_type):
         # mask_pred is already processed to have the same shape as original input
