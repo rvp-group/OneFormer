@@ -393,6 +393,7 @@ class OneFormer(nn.Module):
         segments_info = []
 
         current_segment_id = 0
+        keep_area = torch.ones((cur_masks.shape[0]), dtype=torch.bool)
 
         if cur_masks.shape[0] == 0:
             # We didn't detect any mask :(
@@ -410,6 +411,7 @@ class OneFormer(nn.Module):
 
                 if mask_area > 0 and original_area > 0 and mask.sum().item() > 0:
                     if mask_area / original_area < self.overlap_threshold:
+                        keep_area[k] = False
                         continue
 
                     # merge stuff regions
@@ -431,7 +433,7 @@ class OneFormer(nn.Module):
                         }
                     )
 
-            return panoptic_seg, segments_info, cur_masks, cur_mask_cls
+            return panoptic_seg, segments_info, cur_masks[keep_area], cur_mask_cls[keep_area]
 
     def instance_inference(self, mask_cls, mask_pred, task_type):
         # mask_pred is already processed to have the same shape as original input
