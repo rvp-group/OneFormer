@@ -380,6 +380,8 @@ class OneFormer(nn.Module):
         mask_pred = mask_pred.sigmoid()
 
         keep = labels.ne(self.sem_seg_head.num_classes) & (scores > self.object_mask_threshold)
+        classes_scores = F.softmax(mask_cls, dim=-1)
+        classes_scores = classes_scores[keep]
         cur_scores = scores[keep]
         cur_classes = labels[keep]
         cur_masks = mask_pred[keep]
@@ -433,7 +435,7 @@ class OneFormer(nn.Module):
                         }
                     )
 
-            return panoptic_seg, segments_info, cur_masks[keep_area], cur_scores[keep_area]
+            return panoptic_seg, segments_info, cur_masks[keep_area], classes_scores[keep_area]
 
     def instance_inference(self, mask_cls, mask_pred, task_type):
         # mask_pred is already processed to have the same shape as original input
